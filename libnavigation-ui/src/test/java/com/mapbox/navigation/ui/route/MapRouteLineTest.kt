@@ -258,6 +258,7 @@ class MapRouteLineTest {
             null,
             layerProvider,
             directionsRoutes,
+            listOf(),
             false,
             false,
             mapRouteSourceProvider)

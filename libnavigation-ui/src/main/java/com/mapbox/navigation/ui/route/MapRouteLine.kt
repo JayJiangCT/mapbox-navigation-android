@@ -80,6 +80,7 @@ internal class MapRouteLine(
         belowLayerId: String?,
         layerProvider: MapRouteLayerProvider,
         routeFeatureDatas: List<RouteFeatureData>,
+        routeExpressionData: List<RouteLineExpressionData>,
         allRoutesVisible: Boolean,
         alternativesVisible: Boolean,
         mapRouteSourceProvider: MapRouteSourceProvider
@@ -87,6 +88,7 @@ internal class MapRouteLine(
         this.alternativesVisible = alternativesVisible
         this.allLayersAreVisible = allRoutesVisible
         this.routeFeatureData.addAll(routeFeatureDatas)
+        this.routeLineExpressionData.addAll(routeExpressionData)
     }
 
     private var drawnWaypointsFeatureCollection: FeatureCollection = FeatureCollection.fromFeatures(arrayOf())
@@ -103,6 +105,8 @@ internal class MapRouteLine(
     private var alternativesVisible = true
     private var allLayersAreVisible = true
     private var primaryRoute: DirectionsRoute? = null
+    var vanishPointOffset: Float = 0f
+        private set
 
     private val routeDefaultColor: Int by lazy {
         getStyledColor(
@@ -286,6 +290,17 @@ internal class MapRouteLine(
         }
     }
 
+    fun reEstablishRouteLine(vanishPointOffset: Float) {
+        if (style.isFullyLoaded && routeFeatureData.isNotEmpty()) {
+            primaryRoute = routeFeatureData.first().route
+            val expression = getExpressionAtOffset(vanishPointOffset)
+            style.getLayer(PRIMARY_ROUTE_LAYER_ID)?.setProperties(lineGradient(expression))
+            hideShieldLineAtOffset(vanishPointOffset)
+            setPrimaryRoutesSource(routeFeatureData.first().featureCollection)
+            setWaypointsSource(buildWayPointFeatureCollection(routeFeatureData.first().route))
+        }
+    }
+
     /**
      * Updates which route is identified as the primary route.
      *
@@ -356,6 +371,10 @@ internal class MapRouteLine(
      */
     fun retrieveRouteFeatureData(): List<RouteFeatureData> {
         return routeFeatureData.toList()
+    }
+
+    fun retrieveRouteExpressionData(): List<RouteLineExpressionData> {
+        return routeLineExpressionData
     }
 
     /**
@@ -514,6 +533,7 @@ internal class MapRouteLine(
      * @return the Expression that can be used in a Layer's properties.
      */
     fun getExpressionAtOffset(distanceOffset: Float): Expression {
+        vanishPointOffset = distanceOffset
         val filteredItems = routeLineExpressionData.filter { it.offset > distanceOffset }
         val trafficExpressions = when (filteredItems.isEmpty()) {
             true -> listOf(routeLineExpressionData.last().copy(offset = distanceOffset))
@@ -532,6 +552,7 @@ internal class MapRouteLine(
     }
 
     private fun clearRouteData() {
+        vanishPointOffset = 0f
         directionsRoutes.clear()
         routeFeatureData.clear()
         routeLineExpressionData.clear()

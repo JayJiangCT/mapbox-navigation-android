@@ -203,11 +203,11 @@ class MultipleStopsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private val arrivalObserver = object : ArrivalObserver {
-        override fun onStopArrival(routeLegProgress: RouteLegProgress) {
+        override fun onWaypointArrival(routeLegProgress: RouteLegProgress) {
             findViewById<Button>(R.id.navigateNextRouteLeg).visibility = View.GONE
         }
 
-        override fun onRouteArrival(routeProgress: RouteProgress) {
+        override fun onFinalDestinationArrival(routeProgress: RouteProgress) {
             findViewById<Button>(R.id.navigateNextRouteLeg).visibility = View.GONE
         }
     }

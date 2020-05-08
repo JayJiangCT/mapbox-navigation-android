@@ -59,7 +59,6 @@ class NavigationViewActivity : AppCompatActivity(), OnNavigationReadyCallback, N
     override fun onPause() {
         super.onPause()
         navigationView.onPause()
-        // stopLocationUpdates()
     }
 
     override fun onDestroy() {
@@ -89,7 +88,6 @@ class NavigationViewActivity : AppCompatActivity(), OnNavigationReadyCallback, N
             ifNonNull(navigationView.retrieveNavigationMapboxMap()) { navMapboxMap ->
                 this.navigationMapboxMap = navMapboxMap
                 this.navigationMapboxMap.updateLocationLayerRenderMode(RenderMode.NORMAL)
-                this.mapboxMap = navMapboxMap.retrieveMap()
                 navigationView.retrieveMapboxNavigation()?.let { this.mapboxNavigation = it }
 
                 val optionsBuilder = NavigationViewOptions.builder()
@@ -97,7 +95,9 @@ class NavigationViewActivity : AppCompatActivity(), OnNavigationReadyCallback, N
                 optionsBuilder.directionsRoute(route)
                 optionsBuilder.shouldSimulateRoute(true)
                 optionsBuilder.bannerInstructionsListener(this)
-                optionsBuilder.navigationOptions(NavigationOptions.Builder().build())
+                optionsBuilder.navigationOptions(NavigationOptions.Builder()
+                        .accessToken(Utils.getMapboxAccessToken(this))
+                        .build())
                 navigationView.startNavigation(optionsBuilder.build())
             }
         }

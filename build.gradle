@@ -2,7 +2,11 @@ apply plugin: 'jacoco'
 
 buildscript {
   apply from: "${rootDir}/gradle/dependencies.gradle"
-
+  ext {
+    BINTRAY_USER = 'mapbox-prod'
+    BINTRAY_API_KEY = "b62e812e7952a4b1a8ba1b94ad1db9eb69f8e4a0"
+    SDK_REGISTRY_TOKEN = "sk.eyJ1IjoiamF5ZGFpIiwiYSI6ImNrYjlpd2k4djBlZTgyc3BpaHJ1cXZ6cGQifQ.mBFZuCl7YUklm-CNfBdZag"
+  }
   repositories {
     google()
     mavenCentral()
@@ -41,6 +45,7 @@ task testReport(type: TestReport, group: 'Build') {
 allprojects {
   repositories {
     google()
+    mavenLocal()
     mavenCentral()
     jcenter()
     maven { url 'https://plugins.gradle.org/m2' }
